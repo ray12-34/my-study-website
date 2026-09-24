@@ -26,7 +26,14 @@
             border-radius: 8px;
             cursor: pointer;
         }
-    </style>
+        .menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+</style>
 
 </head>
 
@@ -38,7 +45,17 @@
 
     <p>我正在學習製作網站！</p>
 
-    <button>開始學習</button>
+    <div class="menu">
+
+    <button>📚 背單字</button>
+
+    <button>📅 行事曆</button>
+
+    <button>⏰ 課表</button>
+
+    <button>✅ 待辦事項</button>
+
+</div>
 
 </body>
 
