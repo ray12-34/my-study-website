@@ -1,31 +1,19 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="zh-TW">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
     <title>我的學習中心</title>
 
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f5f5f5;
+            color: #333;
         }
 
-        h1 {
-            color: #333333;
-        }
-
-        p {
-            color: #666666;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
         .menu {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -33,30 +21,119 @@
             max-width: 500px;
             margin: 30px auto;
         }
-</style>
 
+        button {
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        button:hover {
+            background-color: #bfdbfe;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .back {
+            margin-top: 20px;
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
 </head>
-
 <body>
 
-    <h1>我的學習空間</h1>
+    <!-- 首頁 -->
+    <section id="home" class="page active">
+        <h1>我的學習中心</h1>
+        <p>歡迎來到我的個人學習網站！</p>
+        <p>選擇你想使用的功能</p>
 
-    <p>歡迎來到我的個人學習網站！</p>
+        <div class="menu">
+            <button data-page="vocabulary">
+                📚 背單字
+            </button>
 
-    <p>我正在學習製作網站！</p>
+            <button data-page="calendar">
+                📅 行事曆
+            </button>
 
-    <div class="menu">
+            <button data-page="timetable">
+                ⏰ 課表
+            </button>
 
-    <button>📚 背單字</button>
+            <button data-page="todo">
+                ✅ 待辦事項
+            </button>
+        </div>
+    </section>
 
-    <button>📅 行事曆</button>
+    <!-- 背單字頁面 -->
+    <section id="vocabulary" class="page">
+        <h1>📚 背單字</h1>
+        <p>這裡將會放入單字學習系統。</p>
+        <button class="back" data-page="home">
+            返回首頁
+        </button>
+    </section>
 
-    <button>⏰ 課表</button>
+    <!-- 行事曆頁面 -->
+    <section id="calendar" class="page">
+        <h1>📅 行事曆</h1>
+        <p>這裡將會放入行事曆。</p>
+        <button class="back" data-page="home">
+            返回首頁
+        </button>
+    </section>
 
-    <button>✅ 待辦事項</button>
+    <!-- 課表頁面 -->
+    <section id="timetable" class="page">
+        <h1>⏰ 課表</h1>
+        <p>這裡將會放入課表。</p>
+        <button class="back" data-page="home">
+            返回首頁
+        </button>
+    </section>
 
-</div>
+    <!-- 待辦事項頁面 -->
+    <section id="todo" class="page">
+        <h1>✅ 待辦事項</h1>
+        <p>這裡將會放入待辦事項。</p>
+        <button class="back" data-page="home">
+            返回首頁
+        </button>
+    </section>
+    <script>
+    function showPage(pageId) {
+        // 隱藏所有頁面
+        document.querySelectorAll(".page")
+            .forEach(page => {
+                page.classList.remove("active");
+            });
+
+        // 顯示指定的頁面
+        document.getElementById(pageId)
+            .classList.add("active");
+    }
+
+    // 找出所有具有 data-page 的按鈕
+    document.querySelectorAll("[data-page]")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                showPage(button.dataset.page);
+            });
+        });
+</script>
 
 </body>
-
 </html>
