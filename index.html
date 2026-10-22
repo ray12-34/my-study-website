@@ -143,7 +143,43 @@ button:active {
     margin: 0;
     color: #555;
 }
- 
+/* 新增單字的表單 */
+.add-word-form {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* hidden 的元素不顯示 */
+.add-word-form[hidden] {
+    display: none;
+}
+
+.add-word-form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.add-word-form input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+} 
 </style>
 
 </head>
@@ -191,9 +227,35 @@ button:active {
             placeholder="輸入英文或中文搜尋單字"
         >
 
-        <button id="addWord">
+       <button id="addWord">
             ＋ 新增單字
         </button>
+
+        <!-- 新增單字的輸入區域 -->
+        <div id="addWordForm" class="add-word-form" hidden>
+
+        <h3>新增單字</h3>
+
+        <label for="englishInput">英文單字</label>
+        <input
+        type="text"
+        id="englishInput"
+        placeholder="例如：underneath"
+    >
+
+    <label for="chineseInput">中文意思</label>
+    <input
+        type="text"
+        id="chineseInput"
+        placeholder="例如：在……下面"
+    >
+
+    <div class="form-buttons">
+        <button id="saveWord">加入單字</button>
+        <button id="cancelWord">取消</button>
+    </div>
+
+</div>
     </div>
 
     <!-- 單字列表 -->
@@ -269,6 +331,60 @@ button:active {
                 showPage(button.dataset.page);
             });
         });
+    // 找到新增單字需要使用的元素
+const addWordButton = document.getElementById("addWord");
+const addWordForm = document.getElementById("addWordForm");
+const englishInput = document.getElementById("englishInput");
+const chineseInput = document.getElementById("chineseInput");
+const saveWordButton = document.getElementById("saveWord");
+const cancelWordButton = document.getElementById("cancelWord");
+const wordList = document.getElementById("wordList");
+
+// 點擊新增單字，顯示輸入區域
+addWordButton.addEventListener("click", () => {
+    addWordForm.hidden = false;
+    englishInput.focus();
+});
+
+// 點擊取消，隱藏輸入區域
+cancelWordButton.addEventListener("click", () => {
+    addWordForm.hidden = true;
+    englishInput.value = "";
+    chineseInput.value = "";
+});
+
+// 加入單字
+saveWordButton.addEventListener("click", () => {
+    const english = englishInput.value.trim();
+    const chinese = chineseInput.value.trim();
+
+    // 檢查有沒有填寫完整
+    if (english === "" || chinese === "") {
+        alert("請填寫英文單字和中文意思！");
+        return;
+    }
+
+    // 建立新的單字卡片
+    const wordItem = document.createElement("div");
+    wordItem.className = "word-item";
+
+    const wordTitle = document.createElement("h3");
+    wordTitle.textContent = english;
+
+    const wordMeaning = document.createElement("p");
+    wordMeaning.textContent = chinese;
+
+    wordItem.appendChild(wordTitle);
+    wordItem.appendChild(wordMeaning);
+
+    // 將新單字加入列表
+    wordList.appendChild(wordItem);
+
+    // 清空表單並隱藏
+    englishInput.value = "";
+    chineseInput.value = "";
+    addWordForm.hidden = true;
+});
     </script>
 
 </body>
