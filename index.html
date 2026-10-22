@@ -91,8 +91,63 @@ button:active {
         font-size: 17px;
     }
 }
-    </style>
+ 
+/* 單字庫工具列 */
+.word-tools {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    margin: 25px auto;
+    padding: 0 10px;
+}
+
+/* 搜尋輸入框 */
+.word-tools input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+/* 新增單字按鈕 */
+#addWord {
+    background-color: #2563eb;
+    color: white;
+}
+
+/* 單字列表 */
+.word-list {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+/* 每個單字的卡片 */
+.word-item {
+    background: white;
+    margin-bottom: 12px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-align: left;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.word-item h3 {
+    margin: 0 0 8px;
+    color: #1e40af;
+}
+
+.word-item p {
+    margin: 0;
+    color: #555;
+}
+ 
+</style>
+
 </head>
+
 <body>
 
     <!-- 首頁 -->
@@ -214,7 +269,7 @@ button:active {
                 showPage(button.dataset.page);
             });
         });
-</script>
+    </script>
 
 </body>
 </html>
