@@ -120,14 +120,53 @@ button:active {
         </div>
     </section>
 
-    <!-- 背單字頁面 -->
-    <section id="vocabulary" class="page">
-        <h1>📚 背單字</h1>
-        <p>這裡將會放入單字學習系統。</p>
-        <button class="back" data-page="home">
-            返回首頁
+    
+<!-- 背單字頁面 -->
+<section id="vocabulary" class="page">
+
+    <h1>📚 我的單字庫</h1>
+
+    <p>管理自己的單字，開始累積學習紀錄！</p>
+
+    <!-- 搜尋單字 -->
+    <div class="word-tools">
+        <input
+            type="text"
+            id="searchWord"
+            placeholder="輸入英文或中文搜尋單字"
+        >
+
+        <button id="addWord">
+            ＋ 新增單字
         </button>
-    </section>
+    </div>
+
+    <!-- 單字列表 -->
+    <div id="wordList" class="word-list">
+
+        <div class="word-item">
+            <h3>abandon</h3>
+            <p>放棄；遺棄</p>
+        </div>
+
+        <div class="word-item">
+            <h3>benefit</h3>
+            <p>好處；利益</p>
+        </div>
+
+        <div class="word-item">
+            <h3>consume</h3>
+            <p>消耗；消費</p>
+        </div>
+
+    </div>
+
+    <button class="back" data-page="home">
+        返回首頁
+    </button>
+
+</section>
+
 
     <!-- 行事曆頁面 -->
     <section id="calendar" class="page">
