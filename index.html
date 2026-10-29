@@ -340,6 +340,39 @@ const saveWordButton = document.getElementById("saveWord");
 const cancelWordButton = document.getElementById("cancelWord");
 const wordList = document.getElementById("wordList");
 
+// 找到搜尋框
+const searchInput = document.getElementById("searchWord");
+
+// 單字搜尋功能
+searchInput.addEventListener("input", () => {
+
+    // 取得搜尋框的文字，並轉成小寫
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    // 取得單字列表中的所有單字卡片
+    const wordItems = wordList.querySelectorAll(".word-item");
+
+    // 逐一檢查每張單字卡片
+    wordItems.forEach((item) => {
+
+        // 取得英文單字和中文意思
+        const english = item.querySelector("h3").textContent.toLowerCase();
+        const chinese = item.querySelector("p").textContent.toLowerCase();
+
+        // 判斷英文或中文是否包含搜尋文字
+        if (
+            english.includes(keyword) ||
+            chinese.includes(keyword)
+        ) {
+            item.style.display = "";
+        } else {
+            item.style.display = "none";
+        }
+
+    });
+
+});
+
 // 點擊新增單字，顯示輸入區域
 addWordButton.addEventListener("click", () => {
     addWordForm.hidden = !addWordForm.hidden;
