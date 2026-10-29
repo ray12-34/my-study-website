@@ -180,6 +180,20 @@ button:active {
     gap: 10px;
     margin-top: 18px;
 } 
+/* 刪除單字按鈕 */
+.delete-word {
+    margin-top: 12px;
+    padding: 8px 14px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.delete-word:hover {
+    background-color: #fecaca;
+}
 </style>
 
 </head>
@@ -384,7 +398,7 @@ function renderWords() {
     wordList.replaceChildren();
 
     // 逐一檢查每個單字
-    words.forEach((word) => {
+    words.forEach((word, index) => {
 
         const english = word.english.toLowerCase();
         const chinese = word.chinese.toLowerCase();
@@ -407,10 +421,40 @@ function renderWords() {
         const wordMeaning = document.createElement("p");
         wordMeaning.textContent = word.chinese;
 
-        wordItem.appendChild(wordTitle);
-        wordItem.appendChild(wordMeaning);
+        // 將英文和中文放進單字卡片
+wordItem.appendChild(wordTitle);
+wordItem.appendChild(wordMeaning);
 
-        wordList.appendChild(wordItem);
+// 建立刪除按鈕
+const deleteButton = document.createElement("button");
+deleteButton.textContent = "刪除";
+deleteButton.className = "delete-word";
+
+// 點擊後刪除這個單字
+deleteButton.addEventListener("click", () => {
+    const confirmed = confirm(
+        `確定要刪除「${word.english}」嗎？`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    // 從單字資料中移除
+    words.splice(index, 1);
+
+    // 保存更新後的資料
+    saveWords();
+
+    // 重新產生單字列表
+    renderWords();
+});
+
+// 將刪除按鈕放進卡片
+wordItem.appendChild(deleteButton);
+
+// 將卡片放進單字列表
+wordList.appendChild(wordItem);
     });
 }        
 // 目前使用的單字資料
