@@ -260,21 +260,7 @@ button:active {
 
     <!-- 單字列表 -->
     <div id="wordList" class="word-list">
-
-        <div class="word-item">
-            <h3>abandon</h3>
-            <p>放棄；遺棄</p>
-        </div>
-
-        <div class="word-item">
-            <h3>benefit</h3>
-            <p>好處；利益</p>
-        </div>
-
-        <div class="word-item">
-            <h3>consume</h3>
-            <p>消耗；消費</p>
-        </div>
+    </div>
 
     </div>
 
@@ -343,6 +329,106 @@ const wordList = document.getElementById("wordList");
 // 找到搜尋框
 const searchInput = document.getElementById("searchWord");
 
+// 儲存單字使用的名稱
+const STORAGE_KEY = "myVocabulary";
+
+// 預設單字
+const defaultWords = [
+    {
+        english: "abandon",
+        chinese: "放棄；遺棄"
+    },
+    {
+        english: "benefit",
+        chinese: "好處；利益"
+    },
+    {
+        english: "consume",
+        chinese: "消耗；消費"
+    }
+];
+
+// 從瀏覽器讀取之前保存的單字
+function loadWords() {
+    const savedWords = localStorage.getItem(STORAGE_KEY);
+
+    if (savedWords !== null) {
+        try {
+            const parsedWords = JSON.parse(savedWords);
+
+            if (
+                Array.isArray(parsedWords) &&
+                parsedWords.every(word =>
+                    word &&
+                    typeof word.english === "string" &&
+                    typeof word.chinese === "string"
+                )
+            ) {
+                return parsedWords;
+            }
+        } catch (error) {
+            console.error("讀取單字資料失敗：", error);
+        }
+    }
+
+    return defaultWords.map(word => ({ ...word }));
+}
+
+// 根據單字資料產生畫面
+function renderWords() {
+
+    // 取得搜尋文字
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    // 清空目前的單字列表
+    wordList.replaceChildren();
+
+    // 逐一檢查每個單字
+    words.forEach((word) => {
+
+        const english = word.english.toLowerCase();
+        const chinese = word.chinese.toLowerCase();
+
+        // 不符合搜尋條件的單字不顯示
+        if (
+            !english.includes(keyword) &&
+            !chinese.includes(keyword)
+        ) {
+            return;
+        }
+
+        // 建立單字卡片
+        const wordItem = document.createElement("div");
+        wordItem.className = "word-item";
+
+        const wordTitle = document.createElement("h3");
+        wordTitle.textContent = word.english;
+
+        const wordMeaning = document.createElement("p");
+        wordMeaning.textContent = word.chinese;
+
+        wordItem.appendChild(wordTitle);
+        wordItem.appendChild(wordMeaning);
+
+        wordList.appendChild(wordItem);
+    });
+}        
+// 目前使用的單字資料
+let words = loadWords();
+
+// 將目前的單字保存到瀏覽器
+function saveWords() {
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(words)
+        );
+    } catch (error) {
+        alert("單字儲存失敗，請檢查瀏覽器的儲存空間或設定。");
+        console.error("儲存單字失敗：", error);
+    }
+}        
+
 // 單字搜尋功能
 searchInput.addEventListener("input", () => {
 
@@ -352,26 +438,8 @@ searchInput.addEventListener("input", () => {
     // 取得單字列表中的所有單字卡片
     const wordItems = wordList.querySelectorAll(".word-item");
 
-    // 逐一檢查每張單字卡片
-    wordItems.forEach((item) => {
-
-        // 取得英文單字和中文意思
-        const english = item.querySelector("h3").textContent.toLowerCase();
-        const chinese = item.querySelector("p").textContent.toLowerCase();
-
-        // 判斷英文或中文是否包含搜尋文字
-        if (
-            english.includes(keyword) ||
-            chinese.includes(keyword)
-        ) {
-            item.style.display = "";
-        } else {
-            item.style.display = "none";
-        }
-
-    });
-
-});
+    // 輸入搜尋文字時，重新產生單字列表
+searchInput.addEventListener("input", renderWords);
 
 // 點擊新增單字，顯示輸入區域
 addWordButton.addEventListener("click", () => {
@@ -389,38 +457,49 @@ cancelWordButton.addEventListener("click", () => {
     chineseInput.value = "";
 });
 
-// 加入單字
+// 加入新單字
 saveWordButton.addEventListener("click", () => {
+
     const english = englishInput.value.trim();
     const chinese = chineseInput.value.trim();
 
-    // 檢查有沒有填寫完整
+    // 檢查是否填寫完整
     if (english === "" || chinese === "") {
         alert("請填寫英文單字和中文意思！");
         return;
     }
 
-    // 建立新的單字卡片
-    const wordItem = document.createElement("div");
-    wordItem.className = "word-item";
+    // 檢查是否已經存在相同的英文單字
+    const alreadyExists = words.some(
+        word => word.english.toLowerCase() === english.toLowerCase()
+    );
 
-    const wordTitle = document.createElement("h3");
-    wordTitle.textContent = english;
+    if (alreadyExists) {
+        alert("這個英文單字已經存在了！");
+        return;
+    }
 
-    const wordMeaning = document.createElement("p");
-    wordMeaning.textContent = chinese;
+    // 將新單字加入資料列表
+    words.push({
+        english: english,
+        chinese: chinese
+    });
 
-    wordItem.appendChild(wordTitle);
-    wordItem.appendChild(wordMeaning);
+    // 保存資料
+    saveWords();
 
-    // 將新單字加入列表
-    wordList.appendChild(wordItem);
+    // 重新顯示單字
+    renderWords();
 
-    // 清空表單並隱藏
+    // 清空輸入框
     englishInput.value = "";
     chineseInput.value = "";
+
+    // 關閉新增表單
     addWordForm.hidden = true;
 });
+// 網頁載入後，顯示目前保存的單字
+renderWords();
     </script>
 
 </body>
