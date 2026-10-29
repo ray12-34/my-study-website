@@ -229,9 +229,10 @@ button:active {
 
        <button id="addWord">
             ＋ 新增單字
-        </button>
+        </button>        
+</div>
 
-        <!-- 新增單字的輸入區域 -->
+    <!-- 新增單字的輸入區域 -->
         <div id="addWordForm" class="add-word-form" hidden>
 
         <h3>新增單字</h3>
@@ -256,7 +257,6 @@ button:active {
     </div>
 
 </div>
-    </div>
 
     <!-- 單字列表 -->
     <div id="wordList" class="word-list">
@@ -342,8 +342,11 @@ const wordList = document.getElementById("wordList");
 
 // 點擊新增單字，顯示輸入區域
 addWordButton.addEventListener("click", () => {
-    addWordForm.hidden = false;
-    englishInput.focus();
+    addWordForm.hidden = !addWordForm.hidden;
+
+    if (!addWordForm.hidden) {
+        englishInput.focus();
+    }
 });
 
 // 點擊取消，隱藏輸入區域
