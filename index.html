@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
-    <title>我的學習中心1</title>
+    <title>我的學習中心</title>
 
     <style>
         body {
@@ -429,19 +429,10 @@ function saveWords() {
     }
 }        
 
-// 單字搜尋功能
-searchInput.addEventListener("input", () => {
-
-    // 取得搜尋框的文字，並轉成小寫
-    const keyword = searchInput.value.trim().toLowerCase();
-
-    // 取得單字列表中的所有單字卡片
-    const wordItems = wordList.querySelectorAll(".word-item");
-
-    // 輸入搜尋文字時，重新產生單字列表
+// 輸入搜尋文字時，重新產生單字列表
 searchInput.addEventListener("input", renderWords);
 
-// 點擊新增單字，顯示輸入區域
+// 點擊新增單字，顯示或隱藏輸入區域
 addWordButton.addEventListener("click", () => {
     addWordForm.hidden = !addWordForm.hidden;
 
@@ -449,7 +440,6 @@ addWordButton.addEventListener("click", () => {
         englishInput.focus();
     }
 });
-
 // 點擊取消，隱藏輸入區域
 cancelWordButton.addEventListener("click", () => {
     addWordForm.hidden = true;
