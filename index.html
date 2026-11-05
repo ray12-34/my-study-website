@@ -271,6 +271,26 @@ button:active {
 }
 
 
+/* 背單字功能選單 */
+.vocabulary-menu {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px auto;
+}
+
+/* 單字管理按鈕 */
+#showWordList {
+    background-color: white;
+    color: #1e40af;
+}
+
+/* 單字卡區域 */
+#flashcardArea[hidden],
+#wordManagement[hidden] {
+    display: none;
+}
+
 
 
 
@@ -288,7 +308,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/5-2</p>
+        <p>歡迎來到我的個人學習網站！11/5-v3</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -312,54 +332,81 @@ button:active {
 
     
 <!-- 背單字頁面 -->
+
 <section id="vocabulary" class="page">
 
     <h1>📚 我的單字庫</h1>
 
     <p>管理自己的單字，開始累積學習紀錄！</p>
 
-    <!-- 搜尋單字 -->
-    <div class="word-tools">
-        <input
-            type="text"
-            id="searchWord"
-            placeholder="輸入英文或中文搜尋單字"
-        >
+    <!-- 功能選單 -->
+    <div class="vocabulary-menu">
+        <button id="showWordList">單字管理</button>
+        <button id="startFlashcards">開始背單字</button>
+    </div>
 
-       <button id="addWord">
-            ＋ 新增單字
-        </button>        
-</div>
+    <!-- 單字管理區域 -->
+    <div id="wordManagement">
 
-    <!-- 新增單字的輸入區域 -->
+        <!-- 搜尋單字 -->
+        <div class="word-tools">
+            <input
+                type="text"
+                id="searchWord"
+                placeholder="輸入英文或中文搜尋單字"
+            >
+
+            <button id="addWord">＋ 新增單字</button>
+        </div>
+
+        <!-- 新增單字表單 -->
         <div id="addWordForm" class="add-word-form" hidden>
 
-        <h3>新增單字</h3>
+            <h3>新增單字</h3>
 
-        <label for="englishInput">英文單字</label>
-        <input
-        type="text"
-        id="englishInput"
-        placeholder="例如：underneath"
-    >
+            <label for="englishInput">英文單字</label>
+            <input
+                type="text"
+                id="englishInput"
+                placeholder="例如：underneath"
+            >
 
-    <label for="chineseInput">中文意思</label>
-    <input
-        type="text"
-        id="chineseInput"
-        placeholder="例如：在……下面"
-    >
+            <label for="chineseInput">中文意思</label>
+            <input
+                type="text"
+                id="chineseInput"
+                placeholder="例如：在……下面"
+            >
 
-    <div class="form-buttons">
-        <button id="saveWord">加入單字</button>
-        <button id="cancelWord">取消</button>
+            <div class="form-buttons">
+                <button id="saveWord">加入單字</button>
+                <button id="cancelWord">取消</button>
+            </div>
+
+        </div>
+
+        <!-- 單字列表 -->
+        <div id="wordList" class="word-list"></div>
+
     </div>
 
-</div>
+    <!-- 單字卡區域 -->
+    <div id="flashcardArea" hidden>
 
-    <!-- 單字列表 -->
-    <div id="wordList" class="word-list">
-    </div>
+        <p id="cardProgress"></p>
+
+        <div id="flashcard">
+            <div id="flashcardText">abandon</div>
+        </div>
+
+        <p id="cardHint">點擊卡片查看中文意思</p>
+
+        <div class="flashcard-buttons">
+            <button id="prevCard">上一個</button>
+            <button id="nextCard">下一個</button>
+        </div>
+
+        <button id="closeFlashcards">返回單字管理</button>
 
     </div>
 
@@ -734,6 +781,17 @@ function renderFlashcard() {
 }
 
 
+
+// 取得單字管理區域和入口按鈕
+const wordManagement = document.getElementById("wordManagement");
+const showWordList = document.getElementById("showWordList");
+
+// 點擊單字管理
+showWordList.addEventListener("click", () => {
+    wordManagement.hidden = false;
+    flashcardArea.hidden = true;
+});
+
 // 點擊開始背單字
 startFlashcards.addEventListener("click", () => {
 
@@ -742,18 +800,22 @@ startFlashcards.addEventListener("click", () => {
         return;
     }
 
-    // 複製單字資料，避免改變原本的單字庫
+    // 複製單字資料
     flashcardWords = [...words];
 
-    // 隨機排列單字
+    // 隨機排列
     flashcardWords.sort(() => Math.random() - 0.5);
 
     currentCardIndex = 0;
     isFlipped = false;
 
+    // 隱藏單字管理，顯示單字卡
+    wordManagement.hidden = true;
     flashcardArea.hidden = false;
+
     renderFlashcard();
 });
+
 
 
 // 點擊卡片翻面
@@ -796,6 +858,7 @@ nextCard.addEventListener("click", () => {
 // 返回單字列表
 closeFlashcards.addEventListener("click", () => {
     flashcardArea.hidden = true;
+    wordManagement.hidden = false;
 });
 
 
