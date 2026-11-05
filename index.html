@@ -254,6 +254,14 @@ button:active {
 #flashcard.flipped {
     transform: rotateY(180deg);
 }
+/* 翻轉時讓文字轉回正常方向 */
+#flashcardText {
+    display: inline-block;
+}
+
+#flashcard.flipped #flashcardText {
+    transform: rotateY(180deg);
+}        
 
 /* 單字卡按鈕 */
 .flashcard-buttons {
@@ -291,6 +299,35 @@ button:active {
     display: none;
 }
 
+/* 單字功能切換按鈕 */
+#showWordList,
+#startFlashcards {
+    padding: 12px 20px;
+    min-height: 48px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+/* 單字管理按鈕 */
+#showWordList {
+    background-color: white;
+    color: #4f65d9;
+}
+
+/* 開始背單字按鈕 */
+#startFlashcards {
+    background-color: #5969df;
+    color: white;
+}
+
+/* 滑鼠移到按鈕上的效果 */
+#showWordList:hover,
+#startFlashcards:hover {
+    opacity: 0.85;
+}
 
 
 
@@ -406,7 +443,6 @@ button:active {
             <button id="nextCard">下一個</button>
         </div>
 
-        <button id="closeFlashcards">返回單字管理</button>
 
     </div>
 
@@ -738,7 +774,6 @@ const cardHint = document.getElementById("cardHint");
 
 const prevCard = document.getElementById("prevCard");
 const nextCard = document.getElementById("nextCard");
-const closeFlashcards = document.getElementById("closeFlashcards");
 
 // 記錄目前的單字卡位置
 let currentCardIndex = 0;
@@ -855,11 +890,7 @@ nextCard.addEventListener("click", () => {
 });
 
 
-// 返回單字列表
-closeFlashcards.addEventListener("click", () => {
-    flashcardArea.hidden = true;
-    wordManagement.hidden = false;
-});
+
 
 
 
