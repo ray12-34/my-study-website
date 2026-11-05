@@ -194,6 +194,24 @@ button:active {
 .delete-word:hover {
     background-color: #fecaca;
 }
+
+/* 編輯單字按鈕 */
+.edit-word {
+    margin-top: 12px;
+    margin-right: 8px;
+    padding: 8px 14px;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.edit-word:hover {
+    background-color: #bfdbfe;
+}
+
+        
 </style>
 
 </head>
@@ -203,7 +221,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！10/29</p>
+        <p>歡迎來到我的個人學習網站！11/5</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -425,7 +443,63 @@ function renderWords() {
 wordItem.appendChild(wordTitle);
 wordItem.appendChild(wordMeaning);
 
-// 建立刪除按鈕
+    // 建立編輯按鈕
+const editButton = document.createElement("button");
+editButton.textContent = "編輯";
+editButton.className = "edit-word";
+
+    // 點擊後修改單字
+editButton.addEventListener("click", () => {
+
+    // 輸入新的英文
+    const newEnglish = prompt("請輸入新的英文單字：", word.english);
+
+    // 按下取消就結束
+    if (newEnglish === null) {
+        return;
+    }
+
+    // 輸入新的中文意思
+    const newChinese = prompt("請輸入新的中文意思：", word.chinese);
+
+    if (newChinese === null) {
+        return;
+    }
+
+    // 去除前後空白
+    const english = newEnglish.trim();
+    const chinese = newChinese.trim();
+
+    // 檢查是否有填寫完整
+    if (english === "" || chinese === "") {
+        alert("英文和中文意思都不能空白！");
+        return;
+    }
+
+    // 檢查是否與其他單字重複
+    const alreadyExists = words.some((item, i) => {
+        return i !== index &&
+            item.english.toLowerCase() === english.toLowerCase();
+    });
+
+    if (alreadyExists) {
+        alert("這個英文單字已經存在了！");
+        return;
+    }
+
+    // 更新單字資料
+    words[index].english = english;
+    words[index].chinese = chinese;
+
+    // 保存資料
+    saveWords();
+
+    // 重新產生單字列表
+    renderWords();
+
+});
+        
+        // 建立刪除按鈕
 const deleteButton = document.createElement("button");
 deleteButton.textContent = "刪除";
 deleteButton.className = "delete-word";
@@ -450,6 +524,8 @@ deleteButton.addEventListener("click", () => {
     renderWords();
 });
 
+// 將編輯按鈕放進卡片
+wordItem.appendChild(editButton);
 // 將刪除按鈕放進卡片
 wordItem.appendChild(deleteButton);
 
