@@ -211,6 +211,73 @@ button:active {
     background-color: #bfdbfe;
 }
 
+
+/* 開始背單字按鈕 */
+#startFlashcards {
+    margin: 15px 0;
+    padding: 10px 20px;
+    background: #5967d9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* 單字卡區域 */
+#flashcardArea {
+    margin-top: 20px;
+}
+
+/* 單字卡 */
+#flashcard {
+    width: 100%;
+    max-width: 400px;
+    height: 220px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+/* 點擊後的翻面效果 */
+#flashcard.flipped {
+    transform: rotateY(180deg);
+}
+
+/* 單字卡按鈕 */
+.flashcard-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px;
+}
+
+#flashcardArea button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
         
 </style>
 
@@ -221,7 +288,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/5</p>
+        <p>歡迎來到我的個人學習網站！11/5-2</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -610,6 +677,131 @@ saveWordButton.addEventListener("click", () => {
 });
 // 網頁載入後，顯示目前保存的單字
 renderWords();
+
+
+// ===== 單字卡功能 =====
+
+// 取得 HTML 元素
+const startFlashcards = document.getElementById("startFlashcards");
+const flashcardArea = document.getElementById("flashcardArea");
+const flashcard = document.getElementById("flashcard");
+const flashcardText = document.getElementById("flashcardText");
+const cardProgress = document.getElementById("cardProgress");
+const cardHint = document.getElementById("cardHint");
+
+const prevCard = document.getElementById("prevCard");
+const nextCard = document.getElementById("nextCard");
+const closeFlashcards = document.getElementById("closeFlashcards");
+
+// 記錄目前的單字卡位置
+let currentCardIndex = 0;
+
+// 儲存這次背單字的順序
+let flashcardWords = [];
+
+// 記錄目前是否翻面
+let isFlipped = false;
+
+
+// 顯示目前的單字卡
+function renderFlashcard() {
+
+    // 如果沒有單字，就顯示提示
+    if (flashcardWords.length === 0) {
+        flashcardText.textContent = "目前沒有單字";
+        cardProgress.textContent = "0 / 0";
+        return;
+    }
+
+    const word = flashcardWords[currentCardIndex];
+
+    // 顯示英文或中文
+    flashcardText.textContent = isFlipped
+        ? word.chinese
+        : word.english;
+
+    // 更新進度
+    cardProgress.textContent =
+        `第 ${currentCardIndex + 1} / ${flashcardWords.length} 張`;
+
+    // 更新提示文字
+    cardHint.textContent = isFlipped
+        ? "點擊卡片翻回英文"
+        : "點擊卡片查看中文意思";
+
+    // 更新翻面狀態
+    flashcard.classList.toggle("flipped", isFlipped);
+}
+
+
+// 點擊開始背單字
+startFlashcards.addEventListener("click", () => {
+
+    if (words.length === 0) {
+        alert("目前沒有單字，請先新增單字！");
+        return;
+    }
+
+    // 複製單字資料，避免改變原本的單字庫
+    flashcardWords = [...words];
+
+    // 隨機排列單字
+    flashcardWords.sort(() => Math.random() - 0.5);
+
+    currentCardIndex = 0;
+    isFlipped = false;
+
+    flashcardArea.hidden = false;
+    renderFlashcard();
+});
+
+
+// 點擊卡片翻面
+flashcard.addEventListener("click", () => {
+
+    if (flashcardWords.length === 0) return;
+
+    isFlipped = !isFlipped;
+    renderFlashcard();
+});
+
+
+// 上一個單字
+prevCard.addEventListener("click", () => {
+
+    if (flashcardWords.length === 0) return;
+
+    currentCardIndex =
+        (currentCardIndex - 1 + flashcardWords.length)
+        % flashcardWords.length;
+
+    isFlipped = false;
+    renderFlashcard();
+});
+
+
+// 下一個單字
+nextCard.addEventListener("click", () => {
+
+    if (flashcardWords.length === 0) return;
+
+    currentCardIndex =
+        (currentCardIndex + 1) % flashcardWords.length;
+
+    isFlipped = false;
+    renderFlashcard();
+});
+
+
+// 返回單字列表
+closeFlashcards.addEventListener("click", () => {
+    flashcardArea.hidden = true;
+});
+
+
+
+
+        
     </script>
 
 </body>
