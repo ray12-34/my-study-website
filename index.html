@@ -419,7 +419,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/12-v2</p>
+        <p>歡迎來到我的個人學習網站！11/12-v3</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -523,17 +523,14 @@ button:active {
 <!-- 單字測驗選擇區域 -->
 <div id="quizArea" hidden>
 
-    <h2>📝 單字測驗</h2>
-    <p>選擇你想挑戰的測驗模式！</p>
+    <div id="quizMenuContent">
+        <h2>📝 單字測驗</h2>
+        <p>選擇你想挑戰的測驗模式！</p>
 
-    <div class="quiz-menu">
-        <button id="choiceQuiz">
-            模式一：英文選中文
-        </button>
-
-        <button id="spellingQuiz">
-            模式二：提示拼寫
-        </button>
+        <div class="quiz-menu">
+            <button id="choiceQuiz">模式一：英文選中文</button>
+            <button id="spellingQuiz">模式二：提示拼寫</button>
+        </div>
     </div>
 <!-- 模式一：英文選中文 -->
 <div id="choiceQuizArea" hidden>
@@ -979,7 +976,7 @@ function shuffleArray(array) {
 
     return result;
 }
-
+const quizMenuContent = document.getElementById("quizMenuContent");
 // 開始模式一
 choiceQuiz.addEventListener("click", () => {
 
@@ -999,7 +996,7 @@ choiceQuiz.addEventListener("click", () => {
     quizWords = shuffleArray(uniqueWords);
     quizIndex = 0;
 
-    quizArea.hidden = true;
+    quizMenuContent.hidden = true;
     choiceQuizArea.hidden = false;
 
     renderQuestion();
@@ -1108,6 +1105,9 @@ nextQuestion.addEventListener("click", () => {
 
 // 返回測驗模式選擇
 backToQuizMenu.addEventListener("click", () => {
+    choiceQuizArea.hidden = true;
+    quizMenuContent.hidden = false;
+});
 
     choiceQuizArea.hidden = true;
     quizArea.hidden = false;
