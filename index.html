@@ -301,7 +301,8 @@ button:active {
 
 /* 單字功能切換按鈕 */
 #showWordList,
-#startFlashcards {
+#startFlashcards,
+#startQuiz {
     padding: 12px 20px;
     min-height: 48px;
     border: none;
@@ -329,6 +330,29 @@ button:active {
     opacity: 0.85;
 }
 
+/* 測驗區域 */
+#quizArea[hidden] {
+    display: none;
+}
+
+/* 測驗模式選單 */
+.quiz-menu {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 25px auto;
+}
+
+/* 測驗模式按鈕 */
+.quiz-menu button {
+    min-width: 180px;
+    padding: 18px;
+    background-color: white;
+    color: #4f65d9;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
 
 
 
@@ -345,7 +369,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/5-v4</p>
+        <p>歡迎來到我的個人學習網站！11/12-v1</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -380,6 +404,7 @@ button:active {
     <div class="vocabulary-menu">
         <button id="showWordList">單字管理</button>
         <button id="startFlashcards">開始背單字</button>
+        <button id="startQuiz">開始測驗</button>
     </div>
 
     <!-- 單字管理區域 -->
@@ -445,7 +470,23 @@ button:active {
 
 
     </div>
+<!-- 單字測驗選擇區域 -->
+<div id="quizArea" hidden>
 
+    <h2>📝 單字測驗</h2>
+    <p>選擇你想挑戰的測驗模式！</p>
+
+    <div class="quiz-menu">
+        <button id="choiceQuiz">
+            模式一：中文選英文
+        </button>
+
+        <button id="spellingQuiz">
+            模式二：提示拼寫
+        </button>
+    </div>
+
+</div>
     <button class="back" data-page="home">
         返回首頁
     </button>
@@ -820,11 +861,28 @@ function renderFlashcard() {
 // 取得單字管理區域和入口按鈕
 const wordManagement = document.getElementById("wordManagement");
 const showWordList = document.getElementById("showWordList");
+// 取得測驗區域
+const quizArea = document.getElementById("quizArea");
+const startQuiz = document.getElementById("startQuiz");
 
+// 點擊開始測驗
+startQuiz.addEventListener("click", () => {
+
+    if (words.length < 2) {
+        alert("至少需要兩個單字才能開始測驗！");
+        return;
+    }
+
+    wordManagement.hidden = true;
+    flashcardArea.hidden = true;
+    quizArea.hidden = false;
+
+});
 // 點擊單字管理
 showWordList.addEventListener("click", () => {
     wordManagement.hidden = false;
     flashcardArea.hidden = true;
+    quizArea.hidden = true;
 });
 
 // 點擊開始背單字
@@ -847,6 +905,7 @@ startFlashcards.addEventListener("click", () => {
     // 隱藏單字管理，顯示單字卡
     wordManagement.hidden = true;
     flashcardArea.hidden = false;
+    quizArea.hidden = true;
 
     renderFlashcard();
 });
