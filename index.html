@@ -389,7 +389,42 @@ button:active {
     color: white;
     margin: 10px;
 }
+/* 模式二測驗畫面 */
+#spellingQuizArea[hidden] {
+    display: none;
+}
 
+/* 拼寫輸入框 */
+#spellingInput {
+    box-sizing: border-box;
+    width: 90%;
+    max-width: 400px;
+    padding: 14px;
+    margin: 15px auto;
+    border: 2px solid #bfdbfe;
+    border-radius: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* 拼寫提示 */
+#spellingHint {
+    color: #1e40af;
+    letter-spacing: 5px;
+}
+
+/* 確認答案按鈕 */
+#checkSpellingAnswer {
+    background-color: #5969df;
+    color: white;
+}
+
+/* 答題結果 */
+#spellingFeedback {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px;
+}
 
 
 
@@ -419,7 +454,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/19-v1</p>
+        <p>歡迎來到我的個人學習網站！11/19-v2</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -552,8 +587,39 @@ button:active {
     <button id="backToQuizMenu">
         返回測驗模式
     </button>
+<!-- 模式二：提示拼寫 -->
+<div id="spellingQuizArea" hidden>
+
+    <p id="spellingProgress"></p>
+
+    <h2>請根據中文意思拼出英文單字</h2>
+
+    <h1 id="spellingChinese"></h1>
+
+    <h2 id="spellingHint"></h2>
+
+    <input
+        type="text"
+        id="spellingInput"
+        placeholder="請輸入完整英文單字"
+        autocomplete="off"
+    >
+
+    <div>
+        <button id="checkSpellingAnswer">確認答案</button>
+        <button id="nextSpellingQuestion" hidden>下一題</button>
+    </div>
+
+    <p id="spellingFeedback"></p>
+
+    <button id="backFromSpelling">返回測驗模式</button>
 
 </div>
+</div>
+
+
+
+    
 </div>
     <button class="back" data-page="home">
         返回首頁
@@ -936,8 +1002,8 @@ const startQuiz = document.getElementById("startQuiz");
 // 點擊開始測驗
 startQuiz.addEventListener("click", () => {
 
-    if (words.length < 4) {
-    alert("至少需要四個單字才能開始測驗！");
+    if (words.length < 1) {
+    alert("目前沒有單字，請先新增單字！");
     return;
 }
 
@@ -1107,6 +1173,175 @@ nextQuestion.addEventListener("click", () => {
 backToQuizMenu.addEventListener("click", () => {
     choiceQuizArea.hidden = true;
     quizMenuContent.hidden = false;
+});
+
+// ===== 模式二：提示拼寫 =====
+
+// 取得 HTML 元素
+const spellingQuiz = document.getElementById("spellingQuiz");
+const spellingQuizArea = document.getElementById("spellingQuizArea");
+const spellingProgress = document.getElementById("spellingProgress");
+const spellingChinese = document.getElementById("spellingChinese");
+const spellingHint = document.getElementById("spellingHint");
+const spellingInput = document.getElementById("spellingInput");
+const checkSpellingAnswer = document.getElementById("checkSpellingAnswer");
+const nextSpellingQuestion = document.getElementById("nextSpellingQuestion");
+const spellingFeedback = document.getElementById("spellingFeedback");
+const backFromSpelling = document.getElementById("backFromSpelling");
+
+// 記錄這次測驗的單字
+let spellingWords = [];
+let spellingIndex = 0;
+let spellingAnswered = false;
+
+
+// 開始模式二
+spellingQuiz.addEventListener("click", () => {
+
+    if (words.length === 0) {
+        alert("目前沒有單字，請先新增單字！");
+        return;
+    }
+
+    // 隨機排列單字
+    spellingWords = shuffleArray(words);
+    spellingIndex = 0;
+
+    // 切換畫面
+    quizMenuContent.hidden = true;
+    spellingQuizArea.hidden = false;
+
+    renderSpellingQuestion();
+});
+
+
+// 顯示題目
+function renderSpellingQuestion() {
+
+    const currentWord = spellingWords[spellingIndex];
+
+    // 顯示中文意思
+    spellingChinese.textContent = currentWord.chinese;
+
+    // 顯示提示字母
+    const english = currentWord.english;
+
+    if (english.length <= 2) {
+        spellingHint.textContent = english;
+    } else {
+        spellingHint.textContent =
+            english[0] +
+            "_".repeat(english.length - 2) +
+            english[english.length - 1];
+    }
+
+    // 更新進度
+    spellingProgress.textContent =
+        `第 ${spellingIndex + 1} / ${spellingWords.length} 題`;
+
+    // 清空輸入框和答題結果
+    spellingInput.value = "";
+    spellingFeedback.textContent = "";
+
+    // 恢復按鈕狀態
+    spellingInput.disabled = false;
+    checkSpellingAnswer.disabled = false;
+    nextSpellingQuestion.hidden = true;
+
+    spellingAnswered = false;
+
+    spellingInput.focus();
+}
+
+
+// 確認答案
+function checkSpelling() {
+
+    if (spellingAnswered) return;
+
+    const userAnswer = spellingInput.value.trim().toLowerCase();
+
+    if (userAnswer === "") {
+        spellingFeedback.textContent = "請先輸入答案！";
+        spellingFeedback.style.color = "#dc2626";
+        return;
+    }
+
+    const correctAnswer =
+        spellingWords[spellingIndex].english.toLowerCase();
+
+    spellingAnswered = true;
+
+    if (userAnswer === correctAnswer) {
+
+        spellingFeedback.textContent = "答對了！🎉";
+        spellingFeedback.style.color = "#16a34a";
+
+    } else {
+
+        spellingFeedback.textContent =
+            `答錯了！正確答案是：${spellingWords[spellingIndex].english}`;
+
+        spellingFeedback.style.color = "#dc2626";
+    }
+
+    // 鎖定輸入框
+    spellingInput.disabled = true;
+    checkSpellingAnswer.disabled = true;
+
+    // 顯示下一題按鈕
+    nextSpellingQuestion.hidden = false;
+}
+
+
+// 點擊確認答案
+checkSpellingAnswer.addEventListener("click", checkSpelling);
+
+
+// 按 Enter 也可以確認答案
+spellingInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        checkSpelling();
+    }
+});
+
+
+// 下一題
+nextSpellingQuestion.addEventListener("click", () => {
+
+    spellingIndex++;
+
+    // 檢查是否完成測驗
+    if (spellingIndex >= spellingWords.length) {
+
+        spellingChinese.textContent = "測驗完成！";
+        spellingHint.textContent = "";
+        spellingProgress.textContent =
+            `你已經完成 ${spellingWords.length} 題`;
+
+        spellingInput.hidden = true;
+        checkSpellingAnswer.hidden = true;
+        nextSpellingQuestion.hidden = true;
+
+        spellingFeedback.textContent = "🎉 太棒了！";
+        spellingFeedback.style.color = "#16a34a";
+
+        return;
+    }
+
+    renderSpellingQuestion();
+});
+
+
+// 返回測驗模式選單
+backFromSpelling.addEventListener("click", () => {
+
+    spellingQuizArea.hidden = true;
+    quizMenuContent.hidden = false;
+
+    // 恢復輸入框和確認按鈕
+    spellingInput.hidden = false;
+    checkSpellingAnswer.hidden = false;
 });
 
         
