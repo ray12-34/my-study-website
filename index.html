@@ -454,7 +454,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/19-v2</p>
+        <p>歡迎來到我的個人學習網站！11/19-v3</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -555,9 +555,11 @@ button:active {
 
 
     </div>
+
 <!-- 單字測驗選擇區域 -->
 <div id="quizArea" hidden>
 
+    <!-- 測驗模式選單 -->
     <div id="quizMenuContent">
         <h2>📝 單字測驗</h2>
         <p>選擇你想挑戰的測驗模式！</p>
@@ -567,63 +569,61 @@ button:active {
             <button id="spellingQuiz">模式二：提示拼寫</button>
         </div>
     </div>
-<!-- 模式一：英文選中文 -->
-<div id="choiceQuizArea" hidden>
 
-    <p id="quizProgress"></p>
+    <!-- 模式一：英文選中文 -->
+    <div id="choiceQuizArea" hidden>
 
-    <h2>請選出正確的中文意思</h2>
+        <p id="quizProgress"></p>
 
-    <h1 id="quizEnglish"></h1>
+        <h2>請選出正確的中文意思</h2>
 
-    <div id="quizOptions"></div>
+        <h1 id="quizEnglish"></h1>
 
-    <p id="quizFeedback"></p>
+        <div id="quizOptions"></div>
 
-    <button id="nextQuestion" hidden>
-        下一題
-    </button>
+        <p id="quizFeedback"></p>
 
-    <button id="backToQuizMenu">
-        返回測驗模式
-    </button>
-<!-- 模式二：提示拼寫 -->
-<div id="spellingQuizArea" hidden>
+        <button id="nextQuestion" hidden>
+            下一題
+        </button>
 
-    <p id="spellingProgress"></p>
+        <button id="backToQuizMenu">
+            返回測驗模式
+        </button>
 
-    <h2>請根據中文意思拼出英文單字</h2>
-
-    <h1 id="spellingChinese"></h1>
-
-    <h2 id="spellingHint"></h2>
-
-    <input
-        type="text"
-        id="spellingInput"
-        placeholder="請輸入完整英文單字"
-        autocomplete="off"
-    >
-
-    <div>
-        <button id="checkSpellingAnswer">確認答案</button>
-        <button id="nextSpellingQuestion" hidden>下一題</button>
     </div>
 
-    <p id="spellingFeedback"></p>
+    <!-- 模式二：提示拼寫 -->
+    <div id="spellingQuizArea" hidden>
 
-    <button id="backFromSpelling">返回測驗模式</button>
+        <p id="spellingProgress"></p>
+
+        <h2>請根據中文意思拼出英文單字</h2>
+
+        <h1 id="spellingChinese"></h1>
+
+        <h2 id="spellingHint"></h2>
+
+        <input
+            type="text"
+            id="spellingInput"
+            placeholder="請輸入完整英文單字"
+            autocomplete="off"
+        >
+
+        <div>
+            <button id="checkSpellingAnswer">確認答案</button>
+            <button id="nextSpellingQuestion" hidden>下一題</button>
+        </div>
+
+        <p id="spellingFeedback"></p>
+
+        <button id="backFromSpelling">返回測驗模式</button>
+
+    </div>
 
 </div>
-</div>
 
-
-
-    
-</div>
-    <button class="back" data-page="home">
-        返回首頁
-    </button>
 
 </section>
 
