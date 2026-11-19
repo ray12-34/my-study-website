@@ -91,7 +91,89 @@ button:active {
         font-size: 17px;
     }
 }
- 
+/* 資料夾管理區 */
+.folder-tools {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+.folder-tools select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: white;
+}
+.import-tools {
+    margin: 15px 0;
+}
+
+#importPanel {
+    margin-top: 12px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+#importPanel h3 {
+    margin-top: 0;
+}
+
+#importFolderName,
+#importText {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 8px 0 12px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+}
+
+#importText {
+    resize: vertical;
+}
+
+.import-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#importPreview {
+    margin-top: 15px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+#importPreview ul {
+    padding-left: 22px;
+}
+
+#confirmImport:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#deleteFolder {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 14px;
+}
+
+#deleteFolder:hover {
+    background-color: #fecaca;
+}
+
+#deleteFolder:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+} 
 /* 單字庫工具列 */
 .word-tools {
     display: flex;
@@ -454,7 +536,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/19-v3</p>
+        <p>歡迎來到我的個人學習網站！11/19-v4</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -494,7 +576,18 @@ button:active {
 
     <!-- 單字管理區域 -->
     <div id="wordManagement">
+<!-- 資料夾管理區 -->
+<div class="folder-tools">
 
+    <label for="folderSelect">目前資料夾：</label>
+
+    <select id="folderSelect"></select>
+
+    <button id="deleteFolder">
+        刪除資料夾
+    </button>
+
+</div>
         <!-- 搜尋單字 -->
         <div class="word-tools">
             <input
@@ -686,50 +779,91 @@ const wordList = document.getElementById("wordList");
 // 找到搜尋框
 const searchInput = document.getElementById("searchWord");
 
-// 儲存單字使用的名稱
-const STORAGE_KEY = "myVocabulary";
+// ===== 資料夾系統 =====
 
-// 預設單字
-const defaultWords = [
-    {
-        english: "abandon",
-        chinese: "放棄；遺棄"
-    },
-    {
-        english: "benefit",
-        chinese: "好處；利益"
-    },
-    {
-        english: "consume",
-        chinese: "消耗；消費"
-    }
-];
+// 資料夾資料儲存名稱
+const FOLDER_STORAGE_KEY = "myVocabularyFolders";
 
-// 從瀏覽器讀取之前保存的單字
-function loadWords() {
-    const savedWords = localStorage.getItem(STORAGE_KEY);
+// 從瀏覽器讀取資料夾
+function loadWordFolders() {
 
-    if (savedWords !== null) {
+    const savedFolders = localStorage.getItem(FOLDER_STORAGE_KEY);
+
+    if (savedFolders !== null) {
         try {
-            const parsedWords = JSON.parse(savedWords);
+            const parsedFolders = JSON.parse(savedFolders);
 
             if (
-                Array.isArray(parsedWords) &&
-                parsedWords.every(word =>
-                    word &&
-                    typeof word.english === "string" &&
-                    typeof word.chinese === "string"
+                Array.isArray(parsedFolders) &&
+                parsedFolders.length > 0 &&
+                parsedFolders.every(folder =>
+                    folder &&
+                    (typeof folder.id === "number" ||
+                     typeof folder.id === "string") &&
+                    typeof folder.name === "string" &&
+                    Array.isArray(folder.words) &&
+                    folder.words.every(word =>
+                        word &&
+                        typeof word.english === "string" &&
+                        typeof word.chinese === "string"
+                    )
                 )
             ) {
-                return parsedWords;
+                return parsedFolders;
             }
+
         } catch (error) {
-            console.error("讀取單字資料失敗：", error);
+            console.error("讀取資料夾失敗：", error);
         }
     }
 
-    return defaultWords.map(word => ({ ...word }));
+    // 第一次使用時，建立空白資料夾
+    return [
+        {
+            id: Date.now(),
+            name: "未分類",
+            words: []
+        }
+    ];
 }
+
+// 載入資料夾
+let wordFolders = loadWordFolders();
+
+// 目前選擇的資料夾
+let currentFolderId = wordFolders[0].id;
+
+// 取得目前資料夾
+function getCurrentWords() {
+    const folder = wordFolders.find(
+        folder => String(folder.id) === String(currentFolderId)
+    );
+
+    return folder ? folder.words : [];
+}
+
+// 目前正在使用的單字
+let words = getCurrentWords();
+
+// 儲存所有資料夾
+function saveWords() {
+
+    try {
+        localStorage.setItem(
+            FOLDER_STORAGE_KEY,
+            JSON.stringify(wordFolders)
+        );
+
+    } catch (error) {
+        alert("資料儲存失敗，請檢查瀏覽器設定。");
+        console.error("儲存失敗：", error);
+    }
+}
+
+// 初始化資料夾資料
+saveWords();
+
+
 
 // 根據單字資料產生畫面
 function renderWords() {
@@ -858,8 +992,6 @@ wordItem.appendChild(deleteButton);
 wordList.appendChild(wordItem);
     });
 }        
-// 目前使用的單字資料
-let words = loadWords();
 
 // 將目前的單字保存到瀏覽器
 function saveWords() {
@@ -874,6 +1006,331 @@ function saveWords() {
     }
 }        
 
+// ===== 資料夾選單與管理 =====
+
+// 取得 HTML 元素
+const folderSelect = document.getElementById("folderSelect");
+const deleteFolderButton = document.getElementById("deleteFolder");
+
+// 更新資料夾選單
+function renderFolderControls() {
+
+    // 清空選單
+    folderSelect.replaceChildren();
+
+    // 將所有資料夾加入選單
+    wordFolders.forEach(folder => {
+
+        const option = document.createElement("option");
+
+        option.value = folder.id;
+        option.textContent =
+            `${folder.name}（${folder.words.length} 個單字）`;
+
+        folderSelect.appendChild(option);
+    });
+
+    // 選中目前的資料夾
+    folderSelect.value = currentFolderId;
+
+    // 只剩一個資料夾時，不能刪除
+    deleteFolderButton.disabled = wordFolders.length <= 1;
+}
+
+
+// 切換資料夾
+folderSelect.addEventListener("change", () => {
+
+    // 更新目前資料夾 ID
+    currentFolderId = folderSelect.value;
+
+    // 更新目前使用的單字
+    words = getCurrentWords();
+
+    // 清空搜尋框
+    searchInput.value = "";
+
+    // 關閉新增單字表單
+    addWordForm.hidden = true;
+    englishInput.value = "";
+    chineseInput.value = "";
+
+    // 更新單字列表
+    renderWords();
+});
+
+
+// 刪除資料夾
+deleteFolderButton.addEventListener("click", () => {
+
+    // 找出目前資料夾
+    const folder = wordFolders.find(
+        folder => String(folder.id) === String(currentFolderId)
+    );
+
+    if (!folder) return;
+
+    // 確認刪除
+    const confirmed = confirm(
+        `確定要刪除「${folder.name}」資料夾嗎？\n\n` +
+        `裡面共有 ${folder.words.length} 個單字。\n` +
+        `刪除後，裡面的單字也會一起消失！`
+    );
+
+    if (!confirmed) return;
+
+    // 從資料夾列表移除
+    wordFolders = wordFolders.filter(
+        item => String(item.id) !== String(currentFolderId)
+    );
+
+    // 切換到剩下的第一個資料夾
+    currentFolderId = wordFolders[0].id;
+
+    // 更新目前使用的單字
+    words = getCurrentWords();
+
+    // 儲存資料
+    saveWords();
+
+    // 更新畫面
+    renderFolderControls();
+    renderWords();
+// ===== 批次匯入單字 =====
+
+const toggleImportButton = document.getElementById("toggleImport");
+const importPanel = document.getElementById("importPanel");
+const importFolderName = document.getElementById("importFolderName");
+const importText = document.getElementById("importText");
+const previewImportButton = document.getElementById("previewImport");
+const confirmImportButton = document.getElementById("confirmImport");
+const importPreview = document.getElementById("importPreview");
+
+// 開啟或關閉匯入介面
+toggleImportButton.addEventListener("click", () => {
+    importPanel.hidden = !importPanel.hidden;
+});
+
+// 分析輸入的單字
+function analyzeImportText() {
+    const folderName = importFolderName.value.trim();
+    const lines = importText.value.split(/\r?\n/);
+
+    const existingFolder = wordFolders.find(
+        folder => folder.name.trim().toLowerCase() === folderName.toLowerCase()
+    );
+
+    const existingWords = existingFolder ? existingFolder.words : [];
+
+    // 記錄已經出現過的英文單字，避免重複
+    const seenWords = new Set(
+        existingWords.map(word => word.english.trim().toLowerCase())
+    );
+
+    const accepted = [];
+    const issues = [];
+
+    lines.forEach((line, index) => {
+        const currentLine = line.trim();
+
+        // 忽略空白行
+        if (currentLine === "") return;
+
+        const separatorIndex = currentLine.indexOf("|");
+
+        // 檢查是否有分隔符號
+        if (separatorIndex === -1) {
+            issues.push(`第 ${index + 1} 行：缺少 | 分隔符號`);
+            return;
+        }
+
+        const english = currentLine.slice(0, separatorIndex).trim();
+        const chinese = currentLine.slice(separatorIndex + 1).trim();
+
+        // 檢查英文和中文是否都有內容
+        if (!english || !chinese) {
+            issues.push(`第 ${index + 1} 行：英文或中文內容不能空白`);
+            return;
+        }
+
+        const key = english.toLowerCase();
+
+        // 檢查重複單字
+        if (seenWords.has(key)) {
+            issues.push(`第 ${index + 1} 行：${english} 已經存在，將略過`);
+            return;
+        }
+
+        seenWords.add(key);
+
+        accepted.push({
+            english: english,
+            chinese: chinese
+        });
+    });
+
+    return {
+        folderName,
+        accepted,
+        issues
+    };
+}
+
+// 顯示預覽結果
+function showImportPreview() {
+    importPreview.replaceChildren();
+    confirmImportButton.disabled = true;
+
+    const result = analyzeImportText();
+
+    if (!result.folderName) {
+        importPreview.textContent = "請先輸入資料夾名稱。";
+        return;
+    }
+
+    const title = document.createElement("p");
+    title.textContent =
+        `資料夾：${result.folderName}｜可匯入 ${result.accepted.length} 個單字`;
+    importPreview.appendChild(title);
+
+    if (result.accepted.length > 0) {
+        const listTitle = document.createElement("p");
+        listTitle.textContent = "以下是可以匯入的單字：";
+        importPreview.appendChild(listTitle);
+
+        const list = document.createElement("ul");
+
+        result.accepted.forEach(word => {
+            const item = document.createElement("li");
+            item.textContent = `${word.english}：${word.chinese}`;
+            list.appendChild(item);
+        });
+
+        importPreview.appendChild(list);
+    }
+
+    if (result.issues.length > 0) {
+        const issueTitle = document.createElement("p");
+        issueTitle.textContent = "以下內容不會被匯入：";
+        importPreview.appendChild(issueTitle);
+
+        const issueList = document.createElement("ul");
+
+        result.issues.forEach(issue => {
+            const item = document.createElement("li");
+            item.textContent = issue;
+            issueList.appendChild(item);
+        });
+
+        importPreview.appendChild(issueList);
+    }
+
+    if (result.accepted.length === 0) {
+        const message = document.createElement("p");
+        message.textContent = "沒有可以匯入的單字，請檢查輸入內容。";
+        importPreview.appendChild(message);
+    }
+
+    confirmImportButton.disabled = result.accepted.length === 0;
+}
+
+// 點擊預覽按鈕
+previewImportButton.addEventListener("click", showImportPreview);
+
+// 確認匯入
+confirmImportButton.addEventListener("click", () => {
+    // 再次分析，避免匯入過期的預覽結果
+    const result = analyzeImportText();
+
+    if (!result.folderName || result.accepted.length === 0) {
+        alert("目前沒有可以匯入的單字。");
+        return;
+    }
+
+    // 尋找同名資料夾
+    let targetFolder = wordFolders.find(
+        folder => folder.name.trim().toLowerCase() === result.folderName.toLowerCase()
+    );
+
+    // 如果資料夾不存在，就自動建立
+    if (!targetFolder) {
+        targetFolder = {
+            id: Date.now(),
+            name: result.folderName,
+            words: []
+        };
+
+        wordFolders.push(targetFolder);
+    }
+
+    // 將單字加入資料夾
+    targetFolder.words.push(...result.accepted);
+
+    // 切換至剛剛匯入的資料夾
+    currentFolderId = targetFolder.id;
+    words = getCurrentWords();
+
+    // 儲存並更新畫面
+    saveWords();
+    renderFolderControls();
+
+    searchInput.value = "";
+    renderWords();
+
+    // 關閉匯入介面
+    importPanel.hidden = true;
+    importFolderName.value = "";
+    importText.value = "";
+    importPreview.replaceChildren();
+    confirmImportButton.disabled = true;
+
+    alert(`成功匯入 ${result.accepted.length} 個單字！`);
+});
+    // 清空搜尋框
+    searchInput.value = "";
+
+    // 關閉新增單字表單
+    addWordForm.hidden = true;
+    englishInput.value = "";
+    chineseInput.value = "";
+});
+
+
+// 網頁載入時顯示資料夾
+renderFolderControls();
+```
+
+## 3. 測試資料夾功能
+
+完成後，儲存檔案並重新整理網站。
+
+你應該會看到：
+
+<box border radius="lg" padding={3} gap={3}>
+  **📚 我的單字庫**
+  <row align="center" wrap="wrap" gap={2}>
+    <text color="secondary" size="sm">目前資料夾：</text>
+    <box background="surface-secondary" radius="md" padding={{x:3,y:2}}>
+      未分類（0 個單字）　⌄
+    </box>
+    <box background="surface-secondary" radius="md" padding={{x:3,y:2}}>
+      <text color="danger" weight="medium" size="sm">刪除資料夾</text>
+    </box>
+  </row>
+  <caption color="secondary">示意畫面：目前只有一個資料夾，因此刪除按鈕會呈現停用狀態。</caption>
+</box>
+
+請確認以下項目：
+
+1. 網頁能正常開啟，沒有 JavaScript 錯誤。
+2. 資料夾選單出現「未分類」。
+3. 刪除按鈕呈現停用狀態。
+4. 新增一個單字後，選單會更新單字數量。
+5. 重新整理網頁，剛剛新增的單字仍然存在。
+
+**特別提醒：** 目前還沒有新增 L4、L5 的功能，所以選單只有「未分類」是正常的。下一步我們就會製作批次匯入，讓你輸入資料夾名稱，自動建立 L4、L5，並且一次加入大量單字。
+
+先測試這一階段，確認正常後我們就可以進入批次匯入了！
 // 輸入搜尋文字時，重新產生單字列表
 searchInput.addEventListener("input", renderWords);
 
