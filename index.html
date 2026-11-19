@@ -588,6 +588,50 @@ button:active {
     </button>
 
 </div>
+<!-- 批次匯入單字 -->
+<div class="import-tools">
+
+    <button type="button" id="toggleImport">
+        批次匯入單字
+    </button>
+
+    <div id="importPanel" hidden>
+
+        <h3>批次匯入單字</h3>
+
+        <label for="importFolderName">匯入至資料夾：</label>
+
+        <input
+            type="text"
+            id="importFolderName"
+            placeholder="例如：L5"
+        >
+
+        <p>請按照以下格式輸入，每行一個單字：</p>
+
+        <p>英文 | 中文</p>
+
+        <textarea
+            id="importText"
+            rows="8"
+            placeholder="abandon | 放棄；遺棄&#10;benefit | 好處；利益&#10;consume | 消耗；消費"
+        ></textarea>
+
+        <div class="import-buttons">
+            <button type="button" id="previewImport">
+                預覽單字
+            </button>
+
+            <button type="button" id="confirmImport" disabled>
+                確認匯入
+            </button>
+        </div>
+
+        <div id="importPreview"></div>
+
+    </div>
+
+</div>        
         <!-- 搜尋單字 -->
         <div class="word-tools">
             <input
@@ -993,18 +1037,7 @@ wordList.appendChild(wordItem);
     });
 }        
 
-// 將目前的單字保存到瀏覽器
-function saveWords() {
-    try {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(words)
-        );
-    } catch (error) {
-        alert("單字儲存失敗，請檢查瀏覽器的儲存空間或設定。");
-        console.error("儲存單字失敗：", error);
-    }
-}        
+   
 
 // ===== 資料夾選單與管理 =====
 
@@ -1014,15 +1047,10 @@ const deleteFolderButton = document.getElementById("deleteFolder");
 
 // 更新資料夾選單
 function renderFolderControls() {
-
-    // 清空選單
     folderSelect.replaceChildren();
 
-    // 將所有資料夾加入選單
     wordFolders.forEach(folder => {
-
         const option = document.createElement("option");
-
         option.value = folder.id;
         option.textContent =
             `${folder.name}（${folder.words.length} 個單字）`;
@@ -1030,47 +1058,31 @@ function renderFolderControls() {
         folderSelect.appendChild(option);
     });
 
-    // 選中目前的資料夾
     folderSelect.value = currentFolderId;
-
-    // 只剩一個資料夾時，不能刪除
     deleteFolderButton.disabled = wordFolders.length <= 1;
 }
 
-
 // 切換資料夾
 folderSelect.addEventListener("change", () => {
-
-    // 更新目前資料夾 ID
     currentFolderId = folderSelect.value;
-
-    // 更新目前使用的單字
     words = getCurrentWords();
 
-    // 清空搜尋框
     searchInput.value = "";
-
-    // 關閉新增單字表單
     addWordForm.hidden = true;
     englishInput.value = "";
     chineseInput.value = "";
 
-    // 更新單字列表
     renderWords();
 });
 
-
 // 刪除資料夾
 deleteFolderButton.addEventListener("click", () => {
-
-    // 找出目前資料夾
     const folder = wordFolders.find(
         folder => String(folder.id) === String(currentFolderId)
     );
 
-    if (!folder) return;
+    if (!folder || wordFolders.length <= 1) return;
 
-    // 確認刪除
     const confirmed = confirm(
         `確定要刪除「${folder.name}」資料夾嗎？\n\n` +
         `裡面共有 ${folder.words.length} 個單字。\n` +
@@ -1079,23 +1091,24 @@ deleteFolderButton.addEventListener("click", () => {
 
     if (!confirmed) return;
 
-    // 從資料夾列表移除
     wordFolders = wordFolders.filter(
         item => String(item.id) !== String(currentFolderId)
     );
 
-    // 切換到剩下的第一個資料夾
     currentFolderId = wordFolders[0].id;
-
-    // 更新目前使用的單字
     words = getCurrentWords();
 
-    // 儲存資料
     saveWords();
-
-    // 更新畫面
     renderFolderControls();
     renderWords();
+
+    searchInput.value = "";
+    addWordForm.hidden = true;
+    englishInput.value = "";
+    chineseInput.value = "";
+});
+
+
 // ===== 批次匯入單字 =====
 
 const toggleImportButton = document.getElementById("toggleImport");
@@ -1122,7 +1135,6 @@ function analyzeImportText() {
 
     const existingWords = existingFolder ? existingFolder.words : [];
 
-    // 記錄已經出現過的英文單字，避免重複
     const seenWords = new Set(
         existingWords.map(word => word.english.trim().toLowerCase())
     );
@@ -1133,12 +1145,10 @@ function analyzeImportText() {
     lines.forEach((line, index) => {
         const currentLine = line.trim();
 
-        // 忽略空白行
         if (currentLine === "") return;
 
         const separatorIndex = currentLine.indexOf("|");
 
-        // 檢查是否有分隔符號
         if (separatorIndex === -1) {
             issues.push(`第 ${index + 1} 行：缺少 | 分隔符號`);
             return;
@@ -1147,15 +1157,13 @@ function analyzeImportText() {
         const english = currentLine.slice(0, separatorIndex).trim();
         const chinese = currentLine.slice(separatorIndex + 1).trim();
 
-        // 檢查英文和中文是否都有內容
         if (!english || !chinese) {
-            issues.push(`第 ${index + 1} 行：英文或中文內容不能空白`);
+            issues.push(`第 ${index + 1} 行：英文或中文不能空白`);
             return;
         }
 
         const key = english.toLowerCase();
 
-        // 檢查重複單字
         if (seenWords.has(key)) {
             issues.push(`第 ${index + 1} 行：${english} 已經存在，將略過`);
             return;
@@ -1176,7 +1184,7 @@ function analyzeImportText() {
     };
 }
 
-// 顯示預覽結果
+// 顯示預覽
 function showImportPreview() {
     importPreview.replaceChildren();
     confirmImportButton.disabled = true;
@@ -1191,6 +1199,7 @@ function showImportPreview() {
     const title = document.createElement("p");
     title.textContent =
         `資料夾：${result.folderName}｜可匯入 ${result.accepted.length} 個單字`;
+
     importPreview.appendChild(title);
 
     if (result.accepted.length > 0) {
@@ -1234,12 +1243,11 @@ function showImportPreview() {
     confirmImportButton.disabled = result.accepted.length === 0;
 }
 
-// 點擊預覽按鈕
+// 點擊預覽
 previewImportButton.addEventListener("click", showImportPreview);
 
 // 確認匯入
 confirmImportButton.addEventListener("click", () => {
-    // 再次分析，避免匯入過期的預覽結果
     const result = analyzeImportText();
 
     if (!result.folderName || result.accepted.length === 0) {
@@ -1247,12 +1255,11 @@ confirmImportButton.addEventListener("click", () => {
         return;
     }
 
-    // 尋找同名資料夾
     let targetFolder = wordFolders.find(
         folder => folder.name.trim().toLowerCase() === result.folderName.toLowerCase()
     );
 
-    // 如果資料夾不存在，就自動建立
+    // 找不到資料夾就建立新的
     if (!targetFolder) {
         targetFolder = {
             id: Date.now(),
@@ -1263,10 +1270,10 @@ confirmImportButton.addEventListener("click", () => {
         wordFolders.push(targetFolder);
     }
 
-    // 將單字加入資料夾
+    // 加入單字
     targetFolder.words.push(...result.accepted);
 
-    // 切換至剛剛匯入的資料夾
+    // 切換到匯入的資料夾
     currentFolderId = targetFolder.id;
     words = getCurrentWords();
 
@@ -1277,7 +1284,7 @@ confirmImportButton.addEventListener("click", () => {
     searchInput.value = "";
     renderWords();
 
-    // 關閉匯入介面
+    // 清空匯入介面
     importPanel.hidden = true;
     importFolderName.value = "";
     importText.value = "";
@@ -1286,51 +1293,13 @@ confirmImportButton.addEventListener("click", () => {
 
     alert(`成功匯入 ${result.accepted.length} 個單字！`);
 });
-    // 清空搜尋框
-    searchInput.value = "";
 
-    // 關閉新增單字表單
-    addWordForm.hidden = true;
-    englishInput.value = "";
-    chineseInput.value = "";
-});
-
-
-// 網頁載入時顯示資料夾
+// 初始化資料夾選單
 renderFolderControls();
-```
 
-## 3. 測試資料夾功能
 
-完成後，儲存檔案並重新整理網站。
 
-你應該會看到：
 
-<box border radius="lg" padding={3} gap={3}>
-  **📚 我的單字庫**
-  <row align="center" wrap="wrap" gap={2}>
-    <text color="secondary" size="sm">目前資料夾：</text>
-    <box background="surface-secondary" radius="md" padding={{x:3,y:2}}>
-      未分類（0 個單字）　⌄
-    </box>
-    <box background="surface-secondary" radius="md" padding={{x:3,y:2}}>
-      <text color="danger" weight="medium" size="sm">刪除資料夾</text>
-    </box>
-  </row>
-  <caption color="secondary">示意畫面：目前只有一個資料夾，因此刪除按鈕會呈現停用狀態。</caption>
-</box>
-
-請確認以下項目：
-
-1. 網頁能正常開啟，沒有 JavaScript 錯誤。
-2. 資料夾選單出現「未分類」。
-3. 刪除按鈕呈現停用狀態。
-4. 新增一個單字後，選單會更新單字數量。
-5. 重新整理網頁，剛剛新增的單字仍然存在。
-
-**特別提醒：** 目前還沒有新增 L4、L5 的功能，所以選單只有「未分類」是正常的。下一步我們就會製作批次匯入，讓你輸入資料夾名稱，自動建立 L4、L5，並且一次加入大量單字。
-
-先測試這一階段，確認正常後我們就可以進入批次匯入了！
 // 輸入搜尋文字時，重新產生單字列表
 searchInput.addEventListener("input", renderWords);
 
