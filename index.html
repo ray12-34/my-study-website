@@ -536,26 +536,26 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/26v1</p>
+        <p>歡迎來到我的個人學習網站！11/26v2</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
-            <button data-page="vocabulary">
-                📚 背單字
-            </button>
+    <button data-page="vocabulary">
+        📚 背單字
+    </button>
 
-            <button data-page="calendar">
-                📅 行事曆
-            </button>
+    <button data-page="focusTimer">
+        ⏱️ 專注計時
+    </button>
 
-            <button data-page="timetable">
-                ⏰ 課表
-            </button>
+    <button data-page="notes">
+        📝 記事本與待辦
+    </button>
 
-            <button data-page="todo">
-                ✅ 待辦事項
-            </button>
-        </div>
+    <button data-page="statistics">
+        📊 學習統計
+    </button>
+</div>
     </section>
 
     
@@ -769,7 +769,60 @@ button:active {
 
 </section>
 
+<!-- 專注計時器頁面 -->
+<section id="focusTimer" class="page">
 
+    <h1>⏱️ 專注計時器</h1>
+
+    <p>選擇科目與時間，開始專心學習吧！</p>
+
+    <!-- 選擇科目 -->
+    <div>
+        <label for="studySubject">學習科目：</label>
+
+        <select id="studySubject">
+            <option value="國文">國文</option>
+            <option value="英文">英文</option>
+            <option value="數學">數學</option>
+            <option value="自然">自然</option>
+            <option value="社會">社會</option>
+            <option value="其他">其他</option>
+        </select>
+    </div>
+
+    <!-- 選擇時間 -->
+    <div>
+        <p>選擇專注時間：</p>
+
+        <select id="studyDuration">
+            <option value="25">25 分鐘</option>
+            <option value="45">45 分鐘</option>
+            <option value="60">60 分鐘</option>
+        </select>
+    </div>
+
+    <!-- 顯示計時器 -->
+    <div id="timerDisplay">
+        25:00
+    </div>
+
+    <p id="timerStatus">準備開始</p>
+
+    <!-- 計時器按鈕 -->
+    <div>
+        <button id="startTimer">開始</button>
+
+        <button id="pauseTimer">暫停</button>
+
+        <button id="resetTimer">重設</button>
+    </div>
+
+    <!-- 返回首頁 -->
+    <button class="back" data-page="home">
+        ← 返回學習中心
+    </button>
+
+</section>
     <!-- 行事曆頁面 -->
     <section id="calendar" class="page">
         <h1>📅 行事曆</h1>
