@@ -508,7 +508,96 @@ button:active {
     margin: 20px;
 }
 
+/* ===== 專注計時器美化 ===== */
 
+.timer-setting {
+    margin: 20px auto;
+    max-width: 350px;
+    text-align: left;
+}
+
+.timer-setting label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #475569;
+}
+
+.timer-setting input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+}
+
+.timer-card {
+    max-width: 420px;
+    margin: 30px auto;
+    padding: 30px 20px;
+    background: white;
+    border-radius: 22px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.timer-title {
+    color: #64748b;
+    letter-spacing: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#timerDisplay {
+    font-size: 72px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin: 20px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+#timerStatus {
+    color: #64748b;
+    font-size: 17px;
+}
+
+.timer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 25px auto;
+}
+
+.timer-buttons button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.timer-buttons button:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.95);
+}
+
+.start-button {
+    background: #4f46e5;
+    color: white;
+}
+
+.pause-button {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.reset-button {
+    background: #f1f5f9;
+    color: #475569;
+}
 
 
 
@@ -536,7 +625,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/26v3</p>
+        <p>歡迎來到我的個人學習網站！11/26v4</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -776,47 +865,59 @@ button:active {
 
     <p>選擇科目與時間，開始專心學習吧！</p>
 
-    <!-- 選擇科目 -->
-    <div>
-        <label for="studySubject">學習科目：</label>
+   <!-- 自訂學習科目 -->
+<div class="timer-setting">
+    <label for="studySubject">今天要學習什麼？</label>
 
-        <select id="studySubject">
-            <option value="國文">國文</option>
-            <option value="英文">英文</option>
-            <option value="數學">數學</option>
-            <option value="自然">自然</option>
-            <option value="社會">社會</option>
-            <option value="其他">其他</option>
-        </select>
-    </div>
+    <input
+        type="text"
+        id="studySubject"
+        placeholder="例如：英文、數學、自主學習"
+        value="英文"
+    >
+</div>
 
-    <!-- 選擇時間 -->
-    <div>
-        <p>選擇專注時間：</p>
+<!-- 自訂專注時間 -->
+<div class="timer-setting">
+    <label for="studyDuration">設定專注時間（分鐘）</label>
 
-        <select id="studyDuration">
-            <option value="25">25 分鐘</option>
-            <option value="45">45 分鐘</option>
-            <option value="60">60 分鐘</option>
-        </select>
-    </div>
-
+    <input
+        type="number"
+        id="studyDuration"
+        min="1"
+        max="180"
+        value="25"
+    >
+</div>
     <!-- 顯示計時器 -->
+    <div class="timer-card">
+
+    <p class="timer-title">FOCUS TIME</p>
+
     <div id="timerDisplay">
         25:00
     </div>
 
     <p id="timerStatus">準備開始</p>
 
+</div>
+
+    <p id="timerStatus">準備開始</p>
+
     <!-- 計時器按鈕 -->
-    <div>
-        <button id="startTimer">開始</button>
+    <div class="timer-buttons">
+    <button id="startTimer" class="start-button">
+        ▶ 開始專注
+    </button>
 
-        <button id="pauseTimer">暫停</button>
+    <button id="pauseTimer" class="pause-button">
+        ⏸ 暫停
+    </button>
 
-        <button id="resetTimer">重設</button>
-    </div>
-
+    <button id="resetTimer" class="reset-button">
+        ↻ 重設
+    </button>
+</div>
     <!-- 返回首頁 -->
     <button class="back" data-page="home">
         ← 返回學習中心
@@ -1945,7 +2046,15 @@ studyDuration.addEventListener("change", () => {
 
     if (timerInterval !== null) return;
 
-    remainingSeconds = Number(studyDuration.value) * 60;
+    let minutes = Number(studyDuration.value);
+
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) {
+        alert("請輸入 1～180 之間的整數！");
+        studyDuration.value = 25;
+        minutes = 25;
+    }
+
+    remainingSeconds = minutes * 60;
 
     updateTimerDisplay();
 
@@ -1956,7 +2065,11 @@ studyDuration.addEventListener("change", () => {
 
 // ===== 開始計時 =====
 
-startTimerButton.addEventListener("click", () => {
+startTimerButton.addEventListener("click", () => {    
+    if (studySubject.value.trim() === "") {
+        alert("請先輸入學習科目！");
+        return;
+    }    
 
     // 避免重複啟動計時器
     if (timerInterval !== null) return;
