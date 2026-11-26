@@ -536,7 +536,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/26v2</p>
+        <p>歡迎來到我的個人學習網站！11/26v3</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -1899,7 +1899,144 @@ nextCard.addEventListener("click", () => {
     renderFlashcard();
 });
 
+// ===== 專注計時器功能 =====
 
+// 取得 HTML 元素
+const studySubject = document.getElementById("studySubject");
+const studyDuration = document.getElementById("studyDuration");
+
+const timerDisplay = document.getElementById("timerDisplay");
+const timerStatus = document.getElementById("timerStatus");
+
+const startTimerButton = document.getElementById("startTimer");
+const pauseTimerButton = document.getElementById("pauseTimer");
+const resetTimerButton = document.getElementById("resetTimer");
+
+
+// ===== 計時器基本設定 =====
+
+// 目前剩餘秒數
+let remainingSeconds = Number(studyDuration.value) * 60;
+
+// 計時器
+let timerInterval = null;
+
+
+// ===== 更新畫面上的時間 =====
+
+function updateTimerDisplay() {
+
+    const minutes = Math.floor(remainingSeconds / 60);
+
+    const seconds = remainingSeconds % 60;
+
+    timerDisplay.textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+}
+
+// 初始化時間
+updateTimerDisplay();
+
+
+// ===== 選擇專注時間 =====
+
+studyDuration.addEventListener("change", () => {
+
+    if (timerInterval !== null) return;
+
+    remainingSeconds = Number(studyDuration.value) * 60;
+
+    updateTimerDisplay();
+
+    timerStatus.textContent = "準備開始";
+
+});
+
+
+// ===== 開始計時 =====
+
+startTimerButton.addEventListener("click", () => {
+
+    // 避免重複啟動計時器
+    if (timerInterval !== null) return;
+
+    if (remainingSeconds <= 0) {
+        alert("請先重設計時器！");
+        return;
+    }
+
+    timerStatus.textContent = "專注中...";
+
+    studySubject.disabled = true;
+    studyDuration.disabled = true;
+
+    timerInterval = setInterval(() => {
+
+        remainingSeconds--;
+
+        updateTimerDisplay();
+
+        // 時間結束
+        if (remainingSeconds <= 0) {
+
+            clearInterval(timerInterval);
+
+            timerInterval = null;
+
+            remainingSeconds = 0;
+
+            updateTimerDisplay();
+
+            timerStatus.textContent = "專注完成！🎉";
+
+            studySubject.disabled = false;
+            studyDuration.disabled = false;
+
+            alert("恭喜完成這次專注！");
+
+        }
+
+    }, 1000);
+
+});
+
+
+// ===== 暫停計時 =====
+
+pauseTimerButton.addEventListener("click", () => {
+
+    if (timerInterval === null) return;
+
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
+    timerStatus.textContent = "已暫停";
+
+});
+
+
+// ===== 重設計時器 =====
+
+resetTimerButton.addEventListener("click", () => {
+
+    // 停止目前的計時器
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
+    // 恢復原本設定的時間
+    remainingSeconds = Number(studyDuration.value) * 60;
+
+    updateTimerDisplay();
+
+    timerStatus.textContent = "準備開始";
+
+    studySubject.disabled = false;
+    studyDuration.disabled = false;
+
+});
 
 
 
