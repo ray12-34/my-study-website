@@ -599,7 +599,24 @@ button:active {
     color: #475569;
 }
 
+/* 專注進度條 */
 
+.progress-container {
+    width: 100%;
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+#timerProgress {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #818cf8, #4f46e5);
+    border-radius: 20px;
+    transition: width 0.5s linear;
+}
 
 
 
@@ -625,7 +642,7 @@ button:active {
     <!-- 首頁 -->
     <section id="home" class="page active">
         <h1>我的學習中心</h1>
-        <p>歡迎來到我的個人學習網站！11/26v4</p>
+        <p>歡迎來到我的個人學習網站！11/26v5</p>
         <p>選擇你想使用的功能</p>
 
         <div class="menu">
@@ -896,6 +913,9 @@ button:active {
 
     <div id="timerDisplay">
         25:00
+    <div class="progress-container">
+    <div id="timerProgress"></div>
+</div>
     </div>
 
     <p id="timerStatus">準備開始</p>
@@ -2018,7 +2038,9 @@ const resetTimerButton = document.getElementById("resetTimer");
 
 // 目前剩餘秒數
 let remainingSeconds = Number(studyDuration.value) * 60;
+let totalSeconds = remainingSeconds;
 
+const timerProgress = document.getElementById("timerProgress");
 // 計時器
 let timerInterval = null;
 
@@ -2033,7 +2055,11 @@ function updateTimerDisplay() {
 
     timerDisplay.textContent =
         `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        // 計算目前剩餘時間的百分比
+    const progress =
+        (remainingSeconds / totalSeconds) * 100;
 
+    timerProgress.style.width = progress + "%";
 }
 
 // 初始化時間
@@ -2055,7 +2081,7 @@ studyDuration.addEventListener("change", () => {
     }
 
     remainingSeconds = minutes * 60;
-
+    totalSeconds = remainingSeconds;
     updateTimerDisplay();
 
     timerStatus.textContent = "準備開始";
@@ -2141,7 +2167,7 @@ resetTimerButton.addEventListener("click", () => {
 
     // 恢復原本設定的時間
     remainingSeconds = Number(studyDuration.value) * 60;
-
+    totalSeconds = remainingSeconds;
     updateTimerDisplay();
 
     timerStatus.textContent = "準備開始";
